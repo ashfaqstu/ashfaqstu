@@ -1,0 +1,203 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+
+// Function to reverse a string (used internally by intToString)
+void reverseString(char *str) {
+    int n = strlen(str);
+    for (int i = 0; i < n / 2; i++) {
+        char temp = str[i];
+        str[i] = str[n - i - 1];
+        str[n - i - 1] = temp;
+    }
+}
+
+// Function to convert an integer to a string
+void intToString(int num, char *str) {
+    int isNegative = 0;
+    int i = 0;
+
+    // Handle 0 explicitly
+    if (num == 0) {
+        str[i++] = '0';
+        str[i] = '\0';
+        return;
+    }
+
+    // Handle negative numbers
+    if (num < 0) {
+        isNegative = 1;
+        num = -num; // Make the number positive for conversion
+    }
+
+    // Extract digits and convert to characters
+    while (num > 0) {
+        str[i++] = (num % 10) + '0'; // Get the last digit and convert to character
+        num /= 10;                  // Remove the last digit
+    }
+
+    // Add the negative sign if applicable
+    if (isNegative) {
+        str[i++] = '-';
+    }
+
+    str[i] = '\0'; // Null-terminate the string
+
+    // Reverse the string to get the correct order
+    reverseString(str);
+}
+
+// Function to reverse words in a string
+void reverseWords(char *str) {
+    int n = strlen(str);
+    reverseString(str); // Reverse the entire string first
+
+    int start = 0;
+    for (int i = 0; i <= n; i++) {
+        if (str[i] == ' ' || str[i] == '\0') {
+            for (int j = start, k = i - 1; j < k; j++, k--) {
+                char temp = str[j];
+                str[j] = str[k];
+                str[k] = temp;
+            }
+            start = i + 1;
+        }
+    }
+}
+
+// Function to count vowels in a string
+int countVowels(char *str) {
+    int count = 0;
+    for (int i = 0; str[i] != '\0'; i++) {
+        char ch = tolower(str[i]);
+        if (ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
+            count++;
+        }
+    }
+    return count;
+}
+
+// Function to rearrange vowels and consonants
+void rearrangeVowelsConsonants(char *str) {
+    int n = strlen(str);
+    char *vowels = (char *)malloc(n + 1);
+    char *consonants = (char *)malloc(n + 1);
+
+    int v = 0, c = 0;
+    for (int i = 0; str[i] != '\0'; i++) {
+        char ch = tolower(str[i]);
+        if (ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
+            vowels[v++] = str[i];
+        } else if (isalpha(str[i])) {
+            consonants[c++] = str[i];
+        }
+    }
+    vowels[v] = '\0';
+    consonants[c] = '\0';
+
+    strcpy(str, vowels);
+    strcat(str, consonants);
+
+    free(vowels);
+    free(consonants);
+}
+
+// Function to perform bubble sort on the string
+void bubbleSort(char *str) {
+    int n = strlen(str);
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (str[j] > str[j + 1]) {
+                char temp = str[j];
+                str[j] = str[j + 1];
+                str[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Function to convert a string to an integer
+int stringToInteger(char *str) {
+    int result = 0;
+    int sign = 1; // To handle negative numbers
+    int i = 0;
+
+    // Handle leading whitespace
+    while (isspace(str[i])) {
+        i++;
+    }
+
+    // Handle sign
+    if (str[i] == '-' || str[i] == '+') {
+        sign = (str[i] == '-') ? -1 : 1;
+        i++;
+    }
+
+    // Convert characters to integer
+    while (str[i] != '\0' && isdigit(str[i])) {
+        result = result * 10 + (str[i] - '0');
+        i++;
+    }
+
+    return sign * result;
+}
+
+// Main function to demonstrate functionality
+int main() {
+    int n;
+    char *str;
+
+    // Allocate memory dynamically for the string
+    printf("Enter the maximum length of the string: ");
+    scanf("%d", &n);
+    getchar(); // To consume the newline character left by scanf
+    str = (char *)malloc((n + 1) * sizeof(char)); // +1 for null terminator
+
+    printf("Enter the string: ");
+    fgets(str, n + 1, stdin);
+    str[strcspn(str, "\n")] = '\0'; // Remove the newline character
+
+    printf("\nOriginal String: %s\n", str);
+
+    // Reverse the string
+    reverseString(str);
+    printf("Reversed String: %s\n", str);
+
+    // Reverse by word
+    reverseWords(str);
+    printf("Reversed by Word: %s\n", str);
+
+    // Count vowels
+    int vowelCount = countVowels(str);
+    printf("Number of Vowels: %d\n", vowelCount);
+
+    // Rearrange vowels and consonants
+    rearrangeVowelsConsonants(str);
+    printf("Rearranged (Vowels First): %s\n", str);
+
+    // Sort the string using bubble sort
+    bubbleSort(str);
+    printf("Sorted String: %s\n", str);
+
+    // Convert a numeric string to an integer
+    printf("Enter a numeric string to convert to an integer: ");
+    char numericStr[50];
+    fgets(numericStr, 50, stdin);
+    numericStr[strcspn(numericStr, "\n")] = '\0'; // Remove the newline character
+    int num = stringToInteger(numericStr);
+    printf("Converted Integer: %d\n", num);
+
+    // Convert an integer to a string
+    printf("Enter an integer to convert to a string: ");
+    int inputNum;
+    scanf("%d", &inputNum);
+    char intStr[50];
+    intToString(inputNum, intStr);
+    printf("Converted String: %s\n", intStr);
+
+    // Free the allocated memory
+    free(str);
+
+    return 0;
+}
